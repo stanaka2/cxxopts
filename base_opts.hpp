@@ -2,6 +2,37 @@
 
 #include "include/cxxopts.hpp"
 
+/* helper functions */
+// clang-format off
+template <typename T, template <typename...> class Template>
+struct is_specialization : std::false_type {};
+template <template <typename...> class Template, typename... Args>
+struct is_specialization<Template<Args...>, Template> : std::true_type {};
+// clang-format on
+
+template <typename T>
+std::enable_if_t<is_specialization<T, std::vector>::value, std::string> val_to_string(const T &vec)
+{
+  std::ostringstream oss;
+  for(size_t i = 0; i < vec.size(); ++i) {
+    if(i > 0) oss << ",";
+    oss << vec[i];
+  }
+  return oss.str();
+}
+
+std::string val_to_string(const std::string &val) { return val; }
+std::string val_to_string(const bool &val) { return val ? "true" : "false"; }
+
+template <typename T>
+std::enable_if_t<!is_specialization<T, std::vector>::value && !std::is_same<T, bool>::value &&
+                      !std::is_same<T, std::string>::value,
+                  std::string>
+val_to_string(const T &val)
+{
+  return std::to_string(val);
+}
+
 class BaseOptions
 {
 public:
@@ -95,35 +126,4 @@ public:
 protected:
   virtual void add_prog_options(cxxopts::Options &) {  }
   virtual void parse_prog_results(const cxxopts::ParseResult &) { }
-
-  /* helper functions */
-  // clang-format off
-  template <typename T, template <typename...> class Template>
-  struct is_specialization : std::false_type {};
-  template <template <typename...> class Template, typename... Args>
-  struct is_specialization<Template<Args...>, Template> : std::true_type {};
-  // clang-format on
-
-  template <typename T>
-  std::enable_if_t<is_specialization<T, std::vector>::value, std::string> val_to_string(const T &vec)
-  {
-    std::ostringstream oss;
-    for(size_t i = 0; i < vec.size(); ++i) {
-      if(i > 0) oss << ",";
-      oss << vec[i];
-    }
-    return oss.str();
-  }
-
-  std::string val_to_string(const std::string &val) { return val; }
-  std::string val_to_string(const bool &val) { return val ? "true" : "false"; }
-
-  template <typename T>
-  std::enable_if_t<!is_specialization<T, std::vector>::value && !std::is_same<T, bool>::value &&
-                       !std::is_same<T, std::string>::value,
-                   std::string>
-  val_to_string(const T &val)
-  {
-    return std::to_string(val);
-  }
 };
