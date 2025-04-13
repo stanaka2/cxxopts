@@ -9,7 +9,7 @@
 - `base_opts.cpp`でベース部分の実行時パラメータ設定を行う
 - `sample1.cpp`, `sample2.cpp` に簡単なサンプルを用意
 
-## (Features)
+## Features
 
 - A customized version of the `cxxopts` single-header library that allows for separate definitions of base runtime parameters and program-specific runtime parameters
 - A helper function is provided to simplify argument configuration
